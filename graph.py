@@ -1,7 +1,7 @@
 class graph_node:
     label = None 
-    adjlist = None
-    visited = None
+    adjlist = None # adjacency list of the node
+    visited = None # 0 if node is not visited and 1 otherwise
     def __init__(self, l):
         self.label = l
         self.adjlist = []
@@ -40,7 +40,8 @@ class graph:
             i.print()
 
     def add_edge(self,k,l):
-        p = None 
+        p = None #Temporary variable 
+        q = None #Temporary variable
         for i in self.nodes:
             if i.label == k:
                 p = i
@@ -54,11 +55,14 @@ class graph:
             p.add_neighbour(q)
             q.add_neighbour(p)
     
-    def dfs(self):
-        for i in self.nodes:
-            if i.visited == 0:
-                i.dfs()
-
+    def dfs(self, start = -1): # start denotes the label of starting node for dfs
+        if start==-1: # start becomes -1 if label if start node is not provided
+            for i in self.nodes:
+                if i.visited == 0:
+                    i.dfs()
+        else:
+            self.nodes[start].dfs()
+            
 if __name__ == "__main__":
     s = int(input("Please enter the size of the graph : ")) 
     g = graph(s, directed=True) 
@@ -67,5 +71,5 @@ if __name__ == "__main__":
         k = input().split() 
         g.add_edge(int(k[0]),int(k[1]))
     g.print()
-    g.dfs()
+    g.dfs(start=1)
     

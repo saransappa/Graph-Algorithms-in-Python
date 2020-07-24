@@ -18,13 +18,16 @@ class graph_node:
                 print(i.label, end=" -> ") 
             print("\n")
     
-    def dfs(self):
-        print(self.label,end=" -> ")
+    def dfs(self,output):
+        if output:
+            print(self.label,end=" -> ")
         self.visited = 0
         for i in self.adjlist:
             if i.visited == -1:
-                i.dfs()
+                i.dfs(output)
         self.visited = 1
+    
+
         
 class graph:
     size = None
@@ -39,6 +42,7 @@ class graph:
             self.nodes.append(g)
 
     def print(self):
+        print('-'*10+ " Adjacency lists of all vertices "+'-'*10)
         for i in self.nodes:
             i.print()
 
@@ -58,17 +62,20 @@ class graph:
             p.add_neighbour(q)
             q.add_neighbour(p)
     
-    def dfs(self, start = -1): # start denotes the label of starting node for DFS
-        print('-'*10 + " Depth First Search "+'-'*10)
+    def dfs(self, start = -1,output=True,mod_visited = True): # start denotes the label of starting node for DFS. 
+        if output: #output is True if we want to print DFS output else it is False.
+            print('-'*10 + " Depth First Search "+'-'*10)
         if start==-1: # start becomes -1 if label if start node is not provided
             for i in self.nodes:
                 if i.visited == -1:
-                    i.dfs()
+                    i.dfs(output)
         else:
-            self.nodes[start].dfs()
-        for i in self.nodes:  # Marking all nodes as unvisited after completion of DFS 
-            i.visited = -1
-    
+            self.nodes[start].dfs(output)
+        if mod_visited: # mod_visited if True if we want to clear visited attribute of all vertices else it is False.
+            for i in self.nodes:  # Marking all nodes as unvisited after completion of DFS 
+                i.visited = -1
+        print("\n")
+        
     def bfs(self, start = -1): # start denotes the label of starting node for BFS
         print('-'*10 + " Breadth First Search "+'-'*10)
         initial = None 
@@ -89,7 +96,19 @@ class graph:
                     i.visited = 0
         for i in self.nodes:  # Marking all nodes as unvisited after completion of BFS 
             i.visited = -1 
-       
+        print("\n")
+    
+    def isConnected(self):
+        self.dfs(start = 0,output=False, mod_visited=False)
+        for i in self.nodes:
+            if i.visited == -1:
+                print("The graph is disconnected.")
+                return
+        print("The graph is connected.")
+
+                
+
+
 if __name__ == "__main__":
     s = int(input("Please enter the size of the graph : ")) 
     k = int(input("Please enter 1 for directed graph or 0 for undirected graph : ")) 
@@ -105,5 +124,9 @@ if __name__ == "__main__":
         k = input().split() 
         g.add_edge(int(k[0]),int(k[1]))
     g.print()
-    g.bfs(start =2)
+    g.dfs()
+    g.dfs(start=1)
+    g.bfs()
+    g.bfs(start=2)
+    g.isConnected()
     

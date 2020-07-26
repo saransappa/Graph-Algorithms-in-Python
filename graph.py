@@ -1,8 +1,12 @@
+
+# @author: Saran Sappa
+
 class graph_node:
     label = None 
     adjlist = None # adjacency list of the node
     visited = None # -1 if node is not visited, 0 if visited but still under process and 1 if node visited
     component = None # Used for assigning connected component number
+    
     def __init__(self, l):
         self.label = l
         self.adjlist = []
@@ -30,6 +34,17 @@ class graph_node:
             if i.visited == -1:
                 i.dfs(output=output,count=count)
         self.visited = 1
+    
+    def SCC_dfs(self,arr):
+        self.visited = 0
+        k = arr
+        print(self.label)
+        k.append(self.label)        
+        for i in self.adjlist:
+            if i.visited == -1:
+                k = i.SCC_dfs(k)
+        self.visited = 1
+        return k 
         
 class graph:
     size = None
@@ -128,6 +143,35 @@ class graph:
                     print(j.label,end=" -> ")
             print()  
 
+    def SCC_dfs(self):
+        arr = []
+        for i in self.nodes:
+            if i.visited == -1:
+                arr = i.SCC_dfs(arr)
+        for i in self.nodes:  # Marking all nodes as unvisited after completion of BFS 
+            i.visited = -1 
+        return arr 
+    
+    def SCC(self,count_):
+        count = count_
+        for i in range(1,count):
+            print("Strongly Connected Component "+str(i))
+            for j in self.nodes:
+                if j.component == i:
+                    print(j.label,end=" -> ")
+            print()  
+
+def SCC(g,g_): # Call this method to find strongly connected components g= given graph, g_ = reverse graph 
+    k = g_.SCC_dfs()
+    k.reverse()
+    count = 1
+    for i in k:
+        if g.nodes[i].visited == -1:
+            g.nodes[i].dfs(count = count)
+            count+=1
+    
+    g.SCC(count_ = count)
+
             
 if __name__ == "__main__":
     s = int(input("Please enter the size of the graph : ")) 
@@ -140,14 +184,25 @@ if __name__ == "__main__":
     g = graph(s, directed=z) 
     t = int(input("Please enter the no.of edges : ")) 
     print("Please enter the edges in the format \"K l\" (without quotes) for an edge(k,l)")
+    if k == 1:
+        g_ = graph(s,directed=True) 
     for i in range(t):
         k = input().split() 
         g.add_edge(int(k[0]),int(k[1]))
-    g.print()
-    g.dfs()
-    g.dfs(start=1)
-    g.bfs()
-    g.bfs(start =2)
-    g.isConnected()
-    print("No. of connected components in the graph = "+str(g.noOfConnectedComponents()))
-    g.connectedComponents()
+        g_.add_edge(int(k[1]),int(k[0]))
+
+    """
+    Note: Use SCC for directed graphs and connected components for undirected graphs respectively.
+    """    
+    #g.print()
+    #g_.print()
+    
+    #g.dfs()
+    #g_.dfs()
+    #SCC(g,g_)
+    #g.dfs(start=1)
+    #g.bfs()
+    #g.bfs(start =2)
+    #g.isConnected()
+    #print("No. of connected components in the graph = "+str(g.noOfConnectedComponents()))
+    #g.connectedComponents()

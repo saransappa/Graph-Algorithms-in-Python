@@ -2,10 +2,12 @@ class graph_node:
     label = None 
     adjlist = None # adjacency list of the node
     visited = None # -1 if node is not visited, 0 if visited but still under process and 1 if node visited
+    component = None # Used for assigning connected component number
     def __init__(self, l):
         self.label = l
         self.adjlist = []
         self.visited = -1
+        self.component = -1
 
     def add_neighbour(self, k):
         self.adjlist.append(k)
@@ -18,16 +20,16 @@ class graph_node:
                 print(i.label, end=" -> ") 
             print("\n")
     
-    def dfs(self,output):
+    def dfs(self,output=True, count=-1): #count defines the connected component number while finding the connected components
         if output:
             print(self.label,end=" -> ")
         self.visited = 0
+        if count>0:
+            self.component = count 
         for i in self.adjlist:
             if i.visited == -1:
-                i.dfs(output)
+                i.dfs(output=output,count=count)
         self.visited = 1
-    
-
         
 class graph:
     size = None
@@ -68,9 +70,9 @@ class graph:
         if start==-1: # start becomes -1 if label if start node is not provided
             for i in self.nodes:
                 if i.visited == -1:
-                    i.dfs(output)
+                    i.dfs(output=output)
         else:
-            self.nodes[start].dfs(output)
+            self.nodes[start].dfs(output=output)
         if mod_visited: # mod_visited if True if we want to clear visited attribute of all vertices else it is False.
             for i in self.nodes:  # Marking all nodes as unvisited after completion of DFS 
                 i.visited = -1
@@ -106,9 +108,27 @@ class graph:
                 return
         print("The graph is connected.")
 
-                
+    def noOfConnectedComponents(self):
+        _count = 1
+        for i in self.nodes:
+            if i.visited == -1:
+                i.dfs(output=False, count = _count)
+                _count+=1
+        for i in self.nodes:  # Marking all nodes as unvisited after completion of BFS 
+            i.visited = -1 
+        print("\n")
+        return _count    
 
+    def connectedComponents(self):
+        count = self.noOfConnectedComponents()
+        for i in range(1,count):
+            print("Connected Component "+str(i))
+            for j in self.nodes:
+                if j.component == i:
+                    print(j.label,end=" -> ")
+            print()  
 
+            
 if __name__ == "__main__":
     s = int(input("Please enter the size of the graph : ")) 
     k = int(input("Please enter 1 for directed graph or 0 for undirected graph : ")) 
@@ -127,6 +147,7 @@ if __name__ == "__main__":
     g.dfs()
     g.dfs(start=1)
     g.bfs()
-    g.bfs(start=2)
+    g.bfs(start =2)
     g.isConnected()
-    
+    print("No. of connected components in the graph = "+str(g.noOfConnectedComponents()))
+    g.connectedComponents()

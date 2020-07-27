@@ -38,20 +38,32 @@ class graph_node:
     def SCC_dfs(self,arr):
         self.visited = 0
         k = arr
-        print(self.label)
         k.append(self.label)        
         for i in self.adjlist:
             if i.visited == -1:
                 k = i.SCC_dfs(k)
         self.visited = 1
         return k 
+
+    def isCyclic(self):
+        self.visited = 0 
+        k = False 
+        for i in self.adjlist:
+            if i.visited == -1:
+                k = i.isCyclic()
+            if i.visited == 0:
+                return True  
+        self.visited = 1
+        return k
         
 class graph:
     size = None
     directed = None 
     nodes = None 
+    cyclic = None 
     def __init__(self, s, directed=True):
-        self.size =s 
+        self.size =s
+        self.cyclic = False 
         self.directed = directed
         self.nodes = []
         for i in range(s):
@@ -152,7 +164,7 @@ class graph:
             i.visited = -1 
         return arr 
     
-    def SCC(self,count_):
+    def SCCUtil(self,count_):
         count = count_
         for i in range(1,count):
             print("Strongly Connected Component "+str(i))
@@ -161,16 +173,25 @@ class graph:
                     print(j.label,end=" -> ")
             print()  
 
-def SCC(g,g_): # Call this method to find strongly connected components g= given graph, g_ = reverse graph 
-    k = g_.SCC_dfs()
-    k.reverse()
-    count = 1
-    for i in k:
-        if g.nodes[i].visited == -1:
-            g.nodes[i].dfs(count = count)
-            count+=1
-    
-    g.SCC(count_ = count)
+    def SCC(self,g_): # Call this method to find strongly connected components g= given graph, g_ = reverse graph 
+        k = g_.SCC_dfs()
+        k.reverse()
+        count = 1
+        for i in k:
+            if self.nodes[i].visited == -1:
+                self.nodes[i].dfs(output=False,count = count)
+                count+=1
+        self.SCCUtil(count_ = count)
+
+    def isCyclic(self): # Call this method to check the cyclicity of a graph 
+        for i in self.nodes:
+            if i.visited == -1:
+                self.cyclic = i.isCyclic()
+            if i.visited == 0:
+                self.cyclic = True 
+        print(self.cyclic)
+        for i in self.nodes:  # Marking all nodes as unvisited after completion of BFS 
+            i.visited = -1 
 
             
 if __name__ == "__main__":
@@ -192,17 +213,17 @@ if __name__ == "__main__":
         g_.add_edge(int(k[1]),int(k[0]))
 
     """
-    Note: Use SCC for directed graphs and connected components for undirected graphs respectively.
+    Note: Use SCC for directed graphs and connectedComponents for undirected graphs respectively.
     """    
     #g.print()
     #g_.print()
-    
     #g.dfs()
     #g_.dfs()
-    #SCC(g,g_)
+    #g.SCC(g_)
+    #g.isCyclic()
     #g.dfs(start=1)
     #g.bfs()
     #g.bfs(start =2)
     #g.isConnected()
     #print("No. of connected components in the graph = "+str(g.noOfConnectedComponents()))
-    #g.connectedComponents()
+    #g.connectedComponents() 
